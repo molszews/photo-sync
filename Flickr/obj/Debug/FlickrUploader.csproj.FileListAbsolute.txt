@@ -1,0 +1,7 @@
+c:\users\marek.olszewski\documents\visual studio 2013\Projects\Flickr\Flickr\bin\Debug\FlickrUploader.exe.config
+c:\users\marek.olszewski\documents\visual studio 2013\Projects\Flickr\Flickr\bin\Debug\FlickrUploader.exe
+c:\users\marek.olszewski\documents\visual studio 2013\Projects\Flickr\Flickr\bin\Debug\FlickrUploader.pdb
+c:\users\marek.olszewski\documents\visual studio 2013\Projects\Flickr\Flickr\bin\Debug\FlickrNet.dll
+c:\users\marek.olszewski\documents\visual studio 2013\Projects\Flickr\Flickr\obj\Debug\FlickrUploader.csprojResolveAssemblyReference.cache
+c:\users\marek.olszewski\documents\visual studio 2013\Projects\Flickr\Flickr\obj\Debug\FlickrUploader.exe
+c:\users\marek.olszewski\documents\visual studio 2013\Projects\Flickr\Flickr\obj\Debug\FlickrUploader.pdb

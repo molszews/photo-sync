@@ -1,0 +1,1 @@
+c:\users\marek.olszewski\documents\visual studio 2013\Projects\Flickr\Flickr\bin\Debug\Flickr.exe.config
