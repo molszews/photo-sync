@@ -1,14 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Configuration;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using FlickrNet;
 
@@ -17,7 +11,10 @@ namespace FFlickr
     public partial class Form1 : Form
     {
         private string _dir;
-        Flickr f = FlickrManager.GetAuthInstance();
+        readonly Flickr fA = FlickrManager.GetInstance();
+        readonly Flickr f = FlickrManager.GetAuthInstance();
+        private OAuthRequestToken _requestToken;
+        private string _placeholderPhotoId;
 
         public Form1()
         {
@@ -26,17 +23,6 @@ namespace FFlickr
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal);
-            MessageBox.Show(config.FilePath);
-            
-//            requestToken = f.OAuthGetRequestToken("oob");
-//
-//            string url = f.OAuthCalculateAuthorizationUrl(requestToken.Token, AuthLevel.Delete);
-//
-//            System.Diagnostics.Process.Start(url);
-//
-//            var verifier = "711-800-991";
-//            FlickrManager.OAuthToken = f.OAuthGetAccessToken(requestToken, verifier);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -51,6 +37,8 @@ namespace FFlickr
 
         private void button2_Click(object sender, EventArgs e)
         {
+            _placeholderPhotoId = f.UploadPicture("pimpek.png");
+
             var stopwatch = Stopwatch.StartNew();
             var allFiles = Directory.GetFiles(_dir, "*.*", SearchOption.AllDirectories);
             var byFolder = allFiles.GroupBy(Path.GetDirectoryName).ToList();
@@ -60,6 +48,8 @@ namespace FFlickr
             }
             stopwatch.Stop();
             Text = stopwatch.Elapsed.ToString();
+
+            f.PhotosDelete(_placeholderPhotoId);
         }
 
         private void UploadAlbum(IGrouping<string, string> @group)
@@ -67,37 +57,63 @@ namespace FFlickr
             var rootDir = @group.Key;
             var filesInDir = @group.ToList();
             var albumName = rootDir.Replace(_dir, "").Trim('\\');
-            var primaryPhotoId = "25167874736"; //romek
+            var primaryPhotoId = _placeholderPhotoId;
             var photoSet = f.PhotosetsCreate(albumName, primaryPhotoId);
 
             Text = albumName;
 
-
-
             var photoIds = filesInDir.AsParallel().Select(file =>
             {
-                using (var fs = new FileStream(file, FileMode.Open))
+                Application.DoEvents();
+                try
                 {
-                    var photoId = f.UploadPicture(fs,
-                        fileName: Path.GetFileName(file),
-                        title: Path.GetFileNameWithoutExtension(file),
-                        description: "",
-                        tags: "",
-                        isPublic: false,
-                        isFamily: true,
-                        isFriend: false,
-                        contentType: ContentType.Photo,
-                        safetyLevel: SafetyLevel.None,
-                        hiddenFromSearch: HiddenFromSearch.Hidden);
-                    f.PhotosetsAddPhoto(photoSet.PhotosetId, photoId);
+                    using (var fs = new FileStream(file, FileMode.Open))
+                    {
+                        var photoId = f.UploadPicture(fs,
+                            fileName: Path.GetFileName(file),
+                            title: Path.GetFileNameWithoutExtension(file),
+                            description: "",
+                            tags: "",
+                            isPublic: false,
+                            isFamily: true,
+                            isFriend: false,
+                            contentType: ContentType.Photo,
+                            safetyLevel: SafetyLevel.None,
+                            hiddenFromSearch: HiddenFromSearch.Hidden);
+                        Application.DoEvents();
+                        f.PhotosetsAddPhoto(photoSet.PhotosetId, photoId);
 
-                    return photoId;
+                        return photoId;
+                    }
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(file + "\n" + e.Message);
+                    throw;
                 }
             }).ToList();
 
 
             f.PhotosetsSetPrimaryPhoto(photoSet.PhotosetId, photoIds.First());
             f.PhotosetsRemovePhoto(photoSet.PhotosetId, primaryPhotoId);
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            _requestToken = fA.OAuthGetRequestToken("oob");
+            string url = fA.OAuthCalculateAuthorizationUrl(_requestToken.Token, AuthLevel.Delete);
+            Process.Start(url);
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            var verifier = "711-800-991";
+            verifier = textBox1.Text;
+            FlickrManager.OAuthToken = fA.OAuthGetAccessToken(_requestToken, verifier);
+        }
+
+        private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
+        {
         }
     }
 }

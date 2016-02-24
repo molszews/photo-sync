@@ -8,3 +8,4 @@ c:\Users\marek.olszewski\documents\visual studio 2013\Projects\Flickr\FFlickr\ob
 c:\Users\marek.olszewski\documents\visual studio 2013\Projects\Flickr\FFlickr\obj\Debug\FFlickr.csproj.GenerateResource.Cache
 c:\Users\marek.olszewski\documents\visual studio 2013\Projects\Flickr\FFlickr\obj\Debug\FFlickr.exe
 c:\Users\marek.olszewski\documents\visual studio 2013\Projects\Flickr\FFlickr\obj\Debug\FFlickr.pdb
+C:\Users\marek.olszewski\documents\visual studio 2013\Projects\Flickr\FFlickr\bin\Debug\pimpek.png

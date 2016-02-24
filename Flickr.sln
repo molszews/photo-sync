@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlickrUploader", "Flickr\FlickrUploader.csproj", "{AED44D71-A9DF-4D40-B227-072FDE424141}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFlickr", "FFlickr\FFlickr.csproj", "{0D8B0961-50BF-4948-A0DF-3F14A7FC5420}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPFlickr", "WPFlickr\WPFlickr.csproj", "{15D17ADD-AA8D-4D3D-B6D9-52E4E926CAAE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,14 +13,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{AED44D71-A9DF-4D40-B227-072FDE424141}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AED44D71-A9DF-4D40-B227-072FDE424141}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AED44D71-A9DF-4D40-B227-072FDE424141}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AED44D71-A9DF-4D40-B227-072FDE424141}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0D8B0961-50BF-4948-A0DF-3F14A7FC5420}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0D8B0961-50BF-4948-A0DF-3F14A7FC5420}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D8B0961-50BF-4948-A0DF-3F14A7FC5420}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D8B0961-50BF-4948-A0DF-3F14A7FC5420}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15D17ADD-AA8D-4D3D-B6D9-52E4E926CAAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15D17ADD-AA8D-4D3D-B6D9-52E4E926CAAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15D17ADD-AA8D-4D3D-B6D9-52E4E926CAAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15D17ADD-AA8D-4D3D-B6D9-52E4E926CAAE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
