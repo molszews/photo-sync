@@ -1,11 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFlickr", "FFlickr\FFlickr.csproj", "{0D8B0961-50BF-4948-A0DF-3F14A7FC5420}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotoBackup.UI.Wpf", "WPFlickr\PhotoBackup.UI.Wpf.csproj", "{15D17ADD-AA8D-4D3D-B6D9-52E4E926CAAE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPFlickr", "WPFlickr\WPFlickr.csproj", "{15D17ADD-AA8D-4D3D-B6D9-52E4E926CAAE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GooglePhotos", "GooglePhotos\GooglePhotos.csproj", "{60F8F45E-C08B-452E-85BE-7764D222BFF9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotoBackup.Logic", "PhotoBackup.Logic\PhotoBackup.Logic.csproj", "{A9092E9C-8368-4D00-A126-99759D0EEDA5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotoBackup.Logic.Flickr", "PhotoBackup.Logic.Flickr\PhotoBackup.Logic.Flickr.csproj", "{4CC8ED63-043E-4EDF-BDCC-F5A142422C5D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotoBackup.UI.Console", "Flickr\PhotoBackup.UI.Console.csproj", "{AED44D71-A9DF-4D40-B227-072FDE424141}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotoBackup.Logic.GooglePhotos", "PhotoBackup.Logic.GooglePhotos\PhotoBackup.Logic.GooglePhotos.csproj", "{BC6226FB-D0F4-4B3C-B158-D09CC24E818A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,14 +21,30 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0D8B0961-50BF-4948-A0DF-3F14A7FC5420}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0D8B0961-50BF-4948-A0DF-3F14A7FC5420}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0D8B0961-50BF-4948-A0DF-3F14A7FC5420}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0D8B0961-50BF-4948-A0DF-3F14A7FC5420}.Release|Any CPU.Build.0 = Release|Any CPU
 		{15D17ADD-AA8D-4D3D-B6D9-52E4E926CAAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{15D17ADD-AA8D-4D3D-B6D9-52E4E926CAAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{15D17ADD-AA8D-4D3D-B6D9-52E4E926CAAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{15D17ADD-AA8D-4D3D-B6D9-52E4E926CAAE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60F8F45E-C08B-452E-85BE-7764D222BFF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60F8F45E-C08B-452E-85BE-7764D222BFF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60F8F45E-C08B-452E-85BE-7764D222BFF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60F8F45E-C08B-452E-85BE-7764D222BFF9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9092E9C-8368-4D00-A126-99759D0EEDA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9092E9C-8368-4D00-A126-99759D0EEDA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9092E9C-8368-4D00-A126-99759D0EEDA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9092E9C-8368-4D00-A126-99759D0EEDA5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4CC8ED63-043E-4EDF-BDCC-F5A142422C5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CC8ED63-043E-4EDF-BDCC-F5A142422C5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CC8ED63-043E-4EDF-BDCC-F5A142422C5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CC8ED63-043E-4EDF-BDCC-F5A142422C5D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AED44D71-A9DF-4D40-B227-072FDE424141}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AED44D71-A9DF-4D40-B227-072FDE424141}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AED44D71-A9DF-4D40-B227-072FDE424141}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AED44D71-A9DF-4D40-B227-072FDE424141}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC6226FB-D0F4-4B3C-B158-D09CC24E818A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC6226FB-D0F4-4B3C-B158-D09CC24E818A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC6226FB-D0F4-4B3C-B158-D09CC24E818A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC6226FB-D0F4-4B3C-B158-D09CC24E818A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
