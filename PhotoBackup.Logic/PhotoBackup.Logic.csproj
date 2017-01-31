@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Album.cs" />
+    <Compile Include="IPhotoCleaner.cs" />
     <Compile Include="DiskPhotoProvider.cs" />
     <Compile Include="IPhotoProvider.cs" />
     <Compile Include="DiskPhoto.cs" />
@@ -48,6 +49,7 @@
     <Compile Include="Messages\AlbumUploadEnd.cs" />
     <Compile Include="Messages\AlbumUploadStart.cs" />
     <Compile Include="Messages\AlbumUploadFailed.cs" />
+    <Compile Include="Messages\PhotoDeleted.cs" />
     <Compile Include="Messages\PhotoUploadSkipped.cs" />
     <Compile Include="Messages\PhotoUploadFailed.cs" />
     <Compile Include="Messages\PhotoUploadEnd.cs" />

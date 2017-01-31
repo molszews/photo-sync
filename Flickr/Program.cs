@@ -34,6 +34,13 @@ namespace FlickrUploader
             var cachingGoogleAlbumProvider = new CachingGoogleAlbumProvider(googleAlbumsProvider);
             var servicePhotoProvider = new GooglePhotoProvider(googleService, cachingGoogleAlbumProvider);
 
+            var messageHub1 = new TinyMessengerHub();
+            messageHub1.Subscribe<PhotoDeleted>(m => { log.Info($"Photo deleted {m.Photo.Title}"); });
+            var googlePhotoCleaner = new PhotoCleaner(messageHub1, googleService, servicePhotoProvider);
+            googlePhotoCleaner.WipeAllPhotos();
+            Console.ReadKey();
+            return;
+
 //            var flickrService = FlickrAuth.GetAuthInstance();
 //            var flickrPhotosetProvider = new FlickrPhotosetProvider(flickrService);
 //            var cachingFlickrPhotosetProvider = new CachingFlickrPhotosetProvider(flickrPhotosetProvider);

@@ -65,6 +65,7 @@
     <Compile Include="GooglePhotoProvider.cs" />
     <Compile Include="GooglePhotoUploader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PhotoCleaner.cs" />
     <Compile Include="StringExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
