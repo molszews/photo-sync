@@ -1,39 +1,23 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using Google.GData.Client;
-
-namespace PhotoBackup.Logic.GooglePhotos
+﻿namespace PhotoBackup.Logic.GooglePhotos
 {
-
     public class GoogleLimitations
     {
-        private readonly FileHelper _fileHelper;
         public long MaxPhotoSize { get; } = 75L.MB();
         public long MaxVideoSize { get; } = 10L.GB();
         public long MaxItemsInAlbum { get; } = 2000;
         public long MaxNumberOfAlbums { get; } = 20000;
+        
 
-        public GoogleLimitations(FileHelper fileHelper)
+        public bool IsValid(DiskPhoto diskPhoto)
         {
-            _fileHelper = fileHelper;
-        }
-
-        public bool IsValid(FileInfo f)
-        {
-            var x = new List<int>();
-            var y = Enumerable.Empty<int>();
-
-            y = x;
-
-            if (_fileHelper.IsPhotoFile(f))
+            if (FileHelper.IsPhotoFile(diskPhoto.FilePath))
             {
-                return f.Length <= MaxPhotoSize;
+                return diskPhoto.FileSize <= MaxPhotoSize;
             }
-            else if (_fileHelper.IsVideoFile(f))
+            else if (FileHelper.IsVideoFile(diskPhoto.FilePath))
             {
-                return false;
-                return f.Length <= MaxVideoSize;
+//                return false;
+                return diskPhoto.FileSize <= MaxVideoSize;
             }
             return false;
         }

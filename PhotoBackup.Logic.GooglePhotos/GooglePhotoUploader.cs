@@ -9,7 +9,9 @@ using System.Threading.Tasks;
 using Google.GData.Photos;
 using Google.Picasa;
 using PhotoBackup.Logic.Messages;
+using SharedLibrary;
 using TinyMessenger;
+using GoogleAlbum=Google.Picasa.Album;
 
 namespace PhotoBackup.Logic.GooglePhotos
 {
@@ -17,30 +19,42 @@ namespace PhotoBackup.Logic.GooglePhotos
     {
         private readonly PicasaService _picasaService;
         private readonly IGoogleAlbumProvider _googleAlbumProvider;
+        private readonly GoogleLimitations _googleLimitationService;
         private readonly ITinyMessengerHub _messageHub;
-        private readonly GoogleLimitations _googleLimitations;
 
         public GooglePhotoUploader(PicasaService picasaService, 
-            IGoogleAlbumProvider googleAlbumProvider, 
-            ITinyMessengerHub messageHub,
-            GoogleLimitations googleLimitations)
+            IGoogleAlbumProvider googleAlbumProvider,
+            GoogleLimitations googleLimitationService,
+            ITinyMessengerHub messageHub)
         {
             _picasaService = picasaService;
             _googleAlbumProvider = googleAlbumProvider;
+            _googleLimitationService = googleLimitationService;
             _messageHub = messageHub;
-            _googleLimitations = googleLimitations;
         }
 
-        public void UploadPhotos(IEnumerable<DiskPhoto> photos)
+        public void Upload(IEnumerable<DiskPhoto> photos)
         {
-            var filteredPhotos = FilterItems(photos);
-
+            var filteredPhotos = FilterItems(photos).ToList();
             var photosByAlbum = filteredPhotos.GroupBy(p => p.Album, p => p);
             foreach (var albumPhotos in photosByAlbum)
             {
                 var album = albumPhotos.Key;
+                GoogleAlbum googleAlbum;
 
-                UploadPhotosFromAlbum(album, albumPhotos.ToList());
+                try
+                {
+                    googleAlbum = GetOrCreateAlbum(album);
+                }
+                catch (Exception e)
+                {
+                    _messageHub.Publish(new AlbumUploadFailed(album, e));
+                    continue;
+                }
+
+                _messageHub.Publish(new AlbumUploadStart(album));
+                UploadPhotosFromAlbum(googleAlbum, albumPhotos);
+                _messageHub.Publish(new AlbumUploadEnd(album));
             }
         }
 
@@ -48,8 +62,7 @@ namespace PhotoBackup.Logic.GooglePhotos
         {
             foreach (var diskPhoto in photos)
             {
-                var fileInfo = new FileInfo(diskPhoto.Url);
-                if (_googleLimitations.IsValid(fileInfo))
+                if (_googleLimitationService.IsValid(diskPhoto))
                 {
                     yield return diskPhoto;
                 }
@@ -60,34 +73,20 @@ namespace PhotoBackup.Logic.GooglePhotos
             }
         }
 
-        private void UploadPhotosFromAlbum(Album album, IList<DiskPhoto> albumPhotos)
+        private void UploadPhotosFromAlbum(GoogleAlbum album, IEnumerable<DiskPhoto> albumPhotos)
         {
-            _messageHub.Publish(new AlbumUploadStart(album));
-            Google.Picasa.Album googleAlbum = null;
-
-            try
-            {
-                googleAlbum = GetOrCreateAlbum(album);
-            }
-            catch (Exception e)
-            {
-                _messageHub.Publish(new AlbumUploadFailed(album, e));
-                return;
-            }
-
-            var uploadedPhotos = new ConcurrentBag<GooglePhoto>();
-
-            var maxDegreeOfParallelism = 4;
-            Parallel.ForEach(albumPhotos, new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism }, photo =>
+            foreach(var photo in albumPhotos)
             {
                 _messageHub.Publish(new PhotoUploadStart(photo));
-                var flickrPhoto = UploadPhotoWithRetry(googleAlbum, photo);
-                uploadedPhotos.Add(flickrPhoto);
+
+                GooglePhoto ret = null;
+                Utils.Retry(() => ret = UploadPhoto(album, photo),
+                    ex => _messageHub.Publish(new PhotoUploadFailed(photo, ex)),
+                    30);
+                if(ret == null) continue;
 
                 _messageHub.Publish(new PhotoUploadEnd(photo));
-            });
-
-            _messageHub.Publish(new AlbumUploadEnd(album));
+            }
         }
 
         private Google.Picasa.Album GetOrCreateAlbum(Album album)
@@ -113,41 +112,17 @@ namespace PhotoBackup.Logic.GooglePhotos
             var picasaEntry = _picasaService.Insert(feedUri, newEntry);
             return new Google.Picasa.Album {AtomEntry = picasaEntry};
         }
-        
-        private GooglePhoto UploadPhotoWithRetry(Google.Picasa.Album album, DiskPhoto photo, int retriesLeft = 3)
-        {
-            try
-            {
-                return UploadPhoto(album, photo);
-            }
-            catch (Exception e)
-            {
-                _messageHub.Publish(new PhotoUploadFailed(photo, e, retriesLeft));
-
-                if (retriesLeft > 0)
-                {
-                    Thread.Sleep(TimeSpan.FromSeconds(30));
-                    return UploadPhotoWithRetry(album, photo, --retriesLeft);
-                }
-
-                return new GooglePhoto() { Id = "-1" };
-                //                throw;
-            }
-        }
 
         private GooglePhoto UploadPhoto(Google.Picasa.Album album, DiskPhoto photo)
         {
-            using (var fs = new FileStream(photo.Url, FileMode.Open))
+            using (var fs = new FileStream(photo.FilePath, FileMode.Open))
             {
-//                Thread.Sleep(5000);
                 var newUri = new Uri(PicasaQuery.CreatePicasaUri("default", album.Id));
                 var newEntry = (PicasaEntry)_picasaService.Insert(newUri, fs, "Image/jpeg", photo.Title);
                 var newPhoto = new Photo {AtomEntry = newEntry};
-
-                var googlePhoto = photo.ToGooglePhoto();
-                googlePhoto.Id = newPhoto.Id;
-                return googlePhoto;
+                return photo.ToGooglePhoto();
             }
         }
+
     }
 }

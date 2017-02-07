@@ -44,7 +44,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FileHelper.cs" />
     <Compile Include="FlickrAsyncApi.cs" />
+    <Compile Include="FlickrBootstrap.cs" />
     <Compile Include="FlickrLimitations.cs" />
     <Compile Include="FlickrPhoto.cs" />
     <Compile Include="FlickrPhotoProvider.cs" />
@@ -67,6 +69,10 @@
     <ProjectReference Include="..\PhotoBackup.Logic\PhotoBackup.Logic.csproj">
       <Project>{a9092e9c-8368-4d00-a126-99759d0eeda5}</Project>
       <Name>PhotoBackup.Logic</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SharedLibrary\SharedLibrary.csproj">
+      <Project>{4243c54d-b94d-4934-9034-818e625a25b2}</Project>
+      <Name>SharedLibrary</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

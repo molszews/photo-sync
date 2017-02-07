@@ -5,84 +5,65 @@ using System.Linq;
 
 namespace PhotoBackup.Logic
 {
-    public class FileHelper
+    public class DiskPhotoProvider
     {
-        private readonly string[] _photosExtensions = { ".jpg", ".png" };
-        private readonly string[] _videosExtensions = { ".mts", ".mov", ".avi", ".mpg" };
-
-        public bool IsVideoFile(FileInfo file)
-        {
-            return _videosExtensions.Contains(file.Extension, StringComparer.InvariantCultureIgnoreCase);
-        }
-
-        public bool IsPhotoFile(FileInfo file)
-        {
-            return _photosExtensions.Contains(file.Extension, StringComparer.InvariantCultureIgnoreCase);
-        }
-    }
-
-    public class DiskPhotoProvider : IPhotoProvider
-    {
-        private readonly FileHelper _fileHelper;
-        private readonly string _rootDir;
-        private readonly IEnumerable<string> _pathsToSkip;
+        public string RootDir { get; }
         
+        private readonly IEnumerable<string> _pathsToSkip;
 
-        public DiskPhotoProvider(FileHelper fileHelper, string rootDir, IEnumerable<string> dirsToSkip = null)
+        public DiskPhotoProvider(string rootDir, IEnumerable<string> dirsToSkip = null)
         {
-            _fileHelper = fileHelper;
-            _rootDir = rootDir;
-            _pathsToSkip = (dirsToSkip ?? Enumerable.Empty<string>()).Select(d => Path.Combine(_rootDir, d));
+            RootDir = rootDir;
+            _pathsToSkip = dirsToSkip ?? Enumerable.Empty<string>();
         }
 
-        public IEnumerable<IPhoto> GetPhotos()
+        public IEnumerable<DiskPhoto> GetPhotos()
         {
-            var allowedFilesByDir = ListImageFilesInFolder(_rootDir)
-                .GroupBy(f => f.Directory.FullName, f => f)
-                .Where(IsNotInDirToSkip);
+            var allowedFilesByDir = ListImageFilesInFolder(RootDir)
+                .Where(IsNotInDirToSkip)
+                .GroupBy(path => path.Substring(0, path.LastIndexOf(@"\")));
 
             var photos = allowedFilesByDir.SelectMany(g =>
             {
                 var dirPath = g.Key;
-                var album = new Album()
+                var album = new Album
                 {
-                    Title = DirToAlbumName(dirPath),
-                    Url = dirPath
+                    Title = DirToAlbumName(dirPath)
                 };
-                return g.Select(photo => new DiskPhoto()
+
+                return g.Select(photo => new DiskPhoto
                 {
                     Album = album,
-//                    Title = Path.GetFileName(photo.FullName),
-                    Title = Path.GetFileNameWithoutExtension(photo.FullName),
-                    Url = photo.FullName
+                    Title = Path.GetFileNameWithoutExtension(photo),
+                    FilePath = photo,
+                    FileSize = new FileInfo(photo).Length
                 });
             });
             return photos;
         }
 
-        public IEnumerable<IPhoto> GetPhotos(IEnumerable<Album> albums)
+//        public IEnumerable<IPhoto> GetPhotos(IEnumerable<Album> albums)
+//        {
+//            var albumNames = albums.Select(a => a.Title);
+//            var allPhoto = GetPhotos();
+//            return allPhoto.Where(p => albumNames.Contains(p.Album.Title, StringComparer.InvariantCultureIgnoreCase));
+//        }
+
+        private bool IsNotInDirToSkip(string filePath)
         {
-            var albumNames = albums.Select(a => a.Title);
-            var allPhoto = GetPhotos();
-            return allPhoto.Where(p => albumNames.Contains(p.Album.Title, StringComparer.InvariantCultureIgnoreCase));
+            return false == _pathsToSkip.Any(pathToSkip => filePath.StartsWith(Path.Combine(RootDir, pathToSkip), StringComparison.InvariantCultureIgnoreCase));
         }
 
-        private bool IsNotInDirToSkip(IGrouping<string, FileInfo> g)
-        {
-            return !_pathsToSkip.Any(pathToSkip => g.Key.StartsWith(pathToSkip, StringComparison.InvariantCultureIgnoreCase));
-        }
-
-        private IEnumerable<FileInfo> ListImageFilesInFolder(string rootDir)
+        private IEnumerable<string> ListImageFilesInFolder(string rootDir)
         {
             var allfiles = Directory.GetFiles(rootDir, "*.*", SearchOption.AllDirectories);
-            var fileInfos = allfiles.Select(f => new FileInfo(f));
-            var allowedFiles = fileInfos.Where(f => _fileHelper.IsPhotoFile(f) || _fileHelper.IsVideoFile(f));
+            var allowedFiles = allfiles.Where(f => FileHelper.IsPhotoFile(f) || FileHelper.IsVideoFile(f));
             return allowedFiles;
         }
 
         private string DirToAlbumName(string path)
         {
-            return path.Replace(_rootDir, "").TrimStart('\\').Replace("\\", " - ");
+            return path.Replace(RootDir, "").TrimStart('\\').TrimEnd('\\').Replace("\\", " - ");
         }
     }
 }

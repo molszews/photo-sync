@@ -1,27 +1,19 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace PhotoBackup.Logic
 {
-    public class SyncService
+    public static class SyncService
     {
-        class PhotoComparer : IEqualityComparer<IPhoto>
+        public static IEnumerable<T> Except<T>(this IEnumerable<T> localPhotos, IEnumerable<IPhoto> remotePhotos) where T : IPhoto
         {
-            public bool Equals(IPhoto x, IPhoto y)
+            var remoteAsStringList = remotePhotos.Select(p => p.Title + "\\" + p.Album.Title).ToList();
+            foreach (var localPhoto in localPhotos)
             {
-                return x.Title == y.Title && x.Album.Title == y.Album.Title;
+                var diskPhotoAsString = localPhoto.Title + "\\" + localPhoto.Album.Title;
+                if (false == remoteAsStringList.Contains(diskPhotoAsString))
+                    yield return localPhoto;
             }
-
-            public int GetHashCode(IPhoto obj)
-            {
-                return (obj.Title + "\\" + obj.Album.Title).GetHashCode();
-            }
-        }
-
-        public IEnumerable<IPhoto> FindMissingPhotos(IEnumerable<IPhoto> local, IEnumerable<IPhoto> remote)
-        {
-            return local.Except(remote, new PhotoComparer());
         }
     }
 }

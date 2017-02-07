@@ -20,31 +20,28 @@ namespace PhotoBackup.Logic.GooglePhotos
 
         public IEnumerable<IPhoto> GetPhotos()
         {
-            var albums = _googleAlbumProvider.GetAlbums();
-            return GetPhotos(albums.Select(ga => new Album
-            {
-                Title = ga.Title,
-                Url = ga.Id
-            }));
+            return GetPhotos(null);
+        }
+
+        private IEnumerable<PicasaAlbum> FilterAlbums(IEnumerable<Album> albums)
+        {
+            var googleAlbums = _googleAlbumProvider.GetAlbums();
+            if (albums == null) return googleAlbums;
+            return googleAlbums.Where(
+                ga => albums.Select(a => a.Title).Contains(ga.Title, StringComparer.InvariantCultureIgnoreCase));
         }
 
         public IEnumerable<IPhoto> GetPhotos(IEnumerable<Album> albums)
         {
-            var googleAlbums = _googleAlbumProvider.GetAlbums();
-            
-            return albums.SelectMany(a =>
+            var googleAlbums = FilterAlbums(albums);
+            return googleAlbums.SelectMany(googleAlbum =>
             {
-                var googleAlbum =
-                    googleAlbums.SingleOrDefault(ga => ga.Title.Equals(a.Title, StringComparison.InvariantCultureIgnoreCase));
-                if (googleAlbum == null) return Enumerable.Empty<GooglePhoto>();
-
                 var query = new PhotoQuery(PicasaQuery.CreatePicasaUri("default", googleAlbum.Id));
                 var feed = _service.Query(query);
                 return feed.Entries.Select(e => new Photo {AtomEntry = e}).Select(gp => new GooglePhoto
                 {
-                    Album = a,
-                    Title = gp.Title,
-                    Url = gp.PhotoUri.AbsolutePath
+                    Album = new Album {Title = googleAlbum.Title},
+                    Title = gp.Title
                 });
             });
         }

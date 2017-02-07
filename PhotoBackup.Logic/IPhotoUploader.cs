@@ -4,6 +4,6 @@ namespace PhotoBackup.Logic
 {
     public interface IPhotoUploader
     {
-        void UploadPhotos(IEnumerable<DiskPhoto> photos);
+        void Upload(IEnumerable<DiskPhoto> photos);
     }
 }

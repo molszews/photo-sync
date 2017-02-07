@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FlickrNet;
 using PhotoBackup.Logic.Messages;
+using SharedLibrary;
 using TinyMessenger;
 
 namespace PhotoBackup.Logic.Flickr
@@ -16,26 +17,22 @@ namespace PhotoBackup.Logic.Flickr
     {
         private readonly FlickrNet.Flickr _flickrService;
         private readonly FlickrPhotosetProvider _photosetProvider;
-        private readonly FileHelper _fileHelper;
         private readonly FlickrLimitations _flickrLimitations;
         private readonly ITinyMessengerHub _messageHub;
 
         public FlickrPhotoUploader(FlickrNet.Flickr flickrService, FlickrPhotosetProvider photosetProvider, 
-            FileHelper fileHelper, 
             FlickrLimitations flickrLimitations,
             ITinyMessengerHub messageHub)
         {
             _flickrService = flickrService;
             _photosetProvider = photosetProvider;
-            _fileHelper = fileHelper;
             _flickrLimitations = flickrLimitations;
             _messageHub = messageHub;
         }
 
-        public void UploadPhotos(IEnumerable<DiskPhoto> photos)
+        public void Upload(IEnumerable<DiskPhoto> photos)
         {
             var filteredPhotos = FilterItems(photos);
-
 
             var photosByAlbum = filteredPhotos.GroupBy(p => p.Album, p => p);
             foreach (var albumPhotos in photosByAlbum)
@@ -50,8 +47,7 @@ namespace PhotoBackup.Logic.Flickr
         {
             foreach (var diskPhoto in photos)
             {
-                var fileInfo = new FileInfo(diskPhoto.Url);
-                if (_flickrLimitations.IsValid(fileInfo))
+                if (_flickrLimitations.IsValid(diskPhoto))
                 {
                     yield return diskPhoto;
                 }
@@ -67,23 +63,31 @@ namespace PhotoBackup.Logic.Flickr
             _messageHub.Publish(new AlbumUploadStart(album));
 
             var firstPhotoInAlbum = albumPhotos.First();
-            var albumCoverPhoto = UploadPhotoWithRetry(firstPhotoInAlbum);
 
+            FlickrPhoto albumCoverPhoto = null;
+            Utils.Retry(() => albumCoverPhoto = UploadPhoto(firstPhotoInAlbum),
+                ex => _messageHub.Publish(new PhotoUploadFailed(firstPhotoInAlbum, ex)),
+                30);
+            if (albumCoverPhoto == null) return;
+            
             var photoSet = GetOrCreatePhotoSet(album, albumCoverPhoto);
-
-            var uploadedPhotos = new ConcurrentBag<FlickrPhoto>();
-
+            
             var restPhotosInAlbum = albumPhotos.Skip(1);
 
-            Parallel.ForEach(restPhotosInAlbum, new ParallelOptions {MaxDegreeOfParallelism = 8}, photo =>
+            foreach (var photo in restPhotosInAlbum)
             {
                 _messageHub.Publish(new PhotoUploadStart(photo));
-                var flickrPhoto = UploadPhotoWithRetry(photo);
+
+                FlickrPhoto flickrPhoto = null;
+                Utils.Retry(() => flickrPhoto = UploadPhoto(photo),
+                    ex => _messageHub.Publish(new PhotoUploadFailed(photo, ex)),
+                    30);
+                if (flickrPhoto == null) continue;
+                
                 AddPhotoToPhotoset(flickrPhoto.Id, photoSet.PhotosetId);
-                uploadedPhotos.Add(flickrPhoto);
 
                 _messageHub.Publish(new PhotoUploadEnd(photo));
-            });
+            }
 
             _messageHub.Publish(new AlbumUploadEnd(album));
         }
@@ -116,52 +120,17 @@ namespace PhotoBackup.Logic.Flickr
             return photosets.Single(p => p.Title.Equals(title, StringComparison.InvariantCultureIgnoreCase));
         }
 
-        private void AddPhotoToPhotoset(string photoId, string photosetId, int retriesLeft = 3)
+        private void AddPhotoToPhotoset(string photoId, string photosetId)
         {
-            try
-            {
-                _flickrService.PhotosetsAddPhoto(photosetId, photoId);
-            }
-            catch (Exception)
-            {
-                if (retriesLeft > 0)
-                {
-                    Thread.Sleep(TimeSpan.FromSeconds(30));
-                    AddPhotoToPhotoset(photoId, photosetId, --retriesLeft);
-                }
-
-//                throw;
-            }
-
-        }
-
-        private FlickrPhoto UploadPhotoWithRetry(DiskPhoto photo, int retriesLeft = 3)
-        {
-            try
-            {
-                return UploadPhoto(photo);
-            }
-            catch (Exception e)
-            {
-                _messageHub.Publish(new PhotoUploadFailed(photo, e, retriesLeft));
-
-                if (retriesLeft > 0)
-                {
-                    Thread.Sleep(TimeSpan.FromSeconds(30));
-                    return UploadPhotoWithRetry(photo, --retriesLeft);
-                }
-
-                return new FlickrPhoto() {Id = "-1"};
-//                throw;
-            }
+            Utils.Retry(() => _flickrService.PhotosetsAddPhoto(photosetId, photoId), ex => { }, 30);
         }
 
         private FlickrPhoto UploadPhoto(DiskPhoto photo)
         {
-            using (var fs = new FileStream(photo.Url, FileMode.Open))
+            using (var fs = new FileStream(photo.FilePath, FileMode.Open))
             {
                 var photoId = _flickrService.UploadPicture(fs,
-                    fileName: Path.GetFileName(photo.Url),
+                    fileName: Path.GetFileName(photo.FilePath),
                     title: photo.Title,
                     description: "",
                     tags: "",

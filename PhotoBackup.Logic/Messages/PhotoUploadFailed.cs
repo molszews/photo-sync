@@ -7,15 +7,13 @@ namespace PhotoBackup.Logic.Messages
     {
         public readonly DiskPhoto Photo;
         public readonly Exception _e;
-        public readonly int _retriesLeft;
 
         public object Sender { get; }
 
-        public PhotoUploadFailed(DiskPhoto photo, Exception e, int retriesLeft)
+        public PhotoUploadFailed(DiskPhoto photo, Exception e)
         {
             Photo = photo;
             _e = e;
-            _retriesLeft = retriesLeft;
         }
     }
 }

@@ -1,31 +1,23 @@
-﻿using System.Collections.Generic;
-using System.IO;
-
-namespace PhotoBackup.Logic.Flickr
+﻿namespace PhotoBackup.Logic.Flickr
 {
     public class FlickrLimitations
     {
-        private readonly FileHelper _fileHelper;
         public long MaxPhotoSize { get; } = 200L.MB();
         public long MaxVideoSize { get; } = 1L.GB();
 
-        public FlickrLimitations(FileHelper fileHelper)
+        public bool IsValid(DiskPhoto diskPhoto)
         {
-            _fileHelper = fileHelper;
-        }
-
-        public bool IsValid(FileInfo f)
-        {
-            if (_fileHelper.IsPhotoFile(f))
+            if (FileHelper.IsPhotoFile(diskPhoto.FilePath))
             {
-                return f.Length <= MaxPhotoSize;
-            } else if (_fileHelper.IsVideoFile(f))
+                return diskPhoto.FileSize <= MaxPhotoSize;
+            }
+            else if (FileHelper.IsVideoFile(diskPhoto.FilePath))
             {
-                return f.Length <= MaxVideoSize;
+                return diskPhoto.FileSize <= MaxVideoSize;
             }
             return false;
         }
-}
+    }
 
     public static class BytesExtensions
     {

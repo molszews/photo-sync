@@ -4,13 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{BC6226FB-D0F4-4B3C-B158-D09CC24E818A}</ProjectGuid>
+    <ProjectGuid>{4243C54D-B94D-4934-9034-818E625A25B2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PhotoBackup.Logic.GooglePhotos</RootNamespace>
-    <AssemblyName>PhotoBackup.Logic.GooglePhotos</AssemblyName>
+    <RootNamespace>SharedLibrary</RootNamespace>
+    <AssemblyName>SharedLibrary</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,24 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Google.Apis.Auth">
-      <HintPath>..\packages\Google.Apis.Auth.1.11.1\lib\net45\Google.Apis.Auth.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.Apis.Auth.PlatformServices">
-      <HintPath>..\packages\Google.Apis.Auth.1.11.1\lib\net45\Google.Apis.Auth.PlatformServices.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.Apis.Core">
-      <HintPath>..\packages\Google.Apis.Core.1.11.1\lib\net45\Google.Apis.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.Apis.PlatformServices">
-      <HintPath>..\packages\Google.Apis.1.11.1\lib\net45\Google.Apis.PlatformServices.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.GData.Client">
-      <HintPath>..\packages\Google.GData.Client.2.2.0.0\lib\Google.GData.Client.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.GData.Photos">
-      <HintPath>..\packages\Google.GData.Photos.2.2.0.0\lib\Google.GData.Photos.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -58,30 +41,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FileHelper.cs" />
-    <Compile Include="GoogleBootstrap.cs" />
-    <Compile Include="GoogleLimitations.cs" />
-    <Compile Include="GoogleAlbumProvider.cs" />
-    <Compile Include="GoogleAuth.cs" />
-    <Compile Include="GooglePhoto.cs" />
-    <Compile Include="GooglePhotoProvider.cs" />
-    <Compile Include="GooglePhotoUploader.cs" />
+    <Compile Include="Utils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PhotoCleaner.cs" />
-    <Compile Include="StringExtensions.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\PhotoBackup.Logic\PhotoBackup.Logic.csproj">
-      <Project>{A9092E9C-8368-4D00-A126-99759D0EEDA5}</Project>
-      <Name>PhotoBackup.Logic</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SharedLibrary\SharedLibrary.csproj">
-      <Project>{4243c54d-b94d-4934-9034-818e625a25b2}</Project>
-      <Name>SharedLibrary</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

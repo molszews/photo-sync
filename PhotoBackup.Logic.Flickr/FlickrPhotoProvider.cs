@@ -33,13 +33,13 @@ namespace PhotoBackup.Logic.Flickr
         {
             var domainAlbum = new Album()
             {
-                Url = photoSet.Url, Title = photoSet.Title
+               Title = photoSet.Title
             };
 
             var flickrPhotos = GetPhotosInPhotoSet(photoSet);
             return flickrPhotos.Select(p => new DiskPhoto()
             {
-                Url = p.OriginalUrl, Title = p.Title, Album = domainAlbum
+                FilePath = p.OriginalUrl, Title = p.Title, Album = domainAlbum
             });
         }
         
