@@ -19,18 +19,18 @@ namespace FlickrUploader
         private static void Main(string[] args)
         {
             var rootDir = @"H:\Archiwum";
-//            rootDir = @"D:\Archiwum-foto";
+//            rootDir = @"D:\Archiwum";
             var dirsToSkip = new[]
             {
-//                @"2016\18-stka Macieja w Karsinie",
+                @"iMovie",
                 @"Genealogia",
-//                @"2016"
+                @"olszak"
             };
             var diskPhotoProvider = new DiskPhotoProvider(rootDir, dirsToSkip);
 
             var messageHub = GetTinyMessengerHub();
-//            var bootstrap = new GoogleBootstrap(messageHub);
-            var bootstrap = new FlickrBootstrap(messageHub);
+            var bootstrap = new GoogleBootstrap(messageHub);
+//            var bootstrap = new FlickrBootstrap(messageHub);
 
             var orchestrator = new Orchestrator(diskPhotoProvider, bootstrap.RemotePhotoProvider, bootstrap.Uploader);
             orchestrator.Start();

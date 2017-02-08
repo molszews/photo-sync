@@ -38,6 +38,7 @@ namespace PhotoBackup.Logic
 
             DisplayPhotosToUpload(missingPhotos);
 
+            Console.ReadKey();
             Console.Clear();
             
             _photoUploader.Upload(missingPhotos);
@@ -49,9 +50,9 @@ namespace PhotoBackup.Logic
         private static void DisplayPhotosToUpload(List<DiskPhoto> missingPhotos)
         {
             log.Info("-----------------------------------------------------------");
-            log.Info("Photos to upload:");
+            log.Info($"Photos to upload (first 50 of {missingPhotos.Count}):");
 
-            foreach (var photo in missingPhotos)
+            foreach (var photo in missingPhotos.Take(50))
             {
                 log.Info($"\t{photo.Album.Title} - {photo.Title}");
             }
@@ -60,9 +61,9 @@ namespace PhotoBackup.Logic
         private static void DisplayRemotePhotos(List<IPhoto> remotePhotos)
         {
             log.Info("-----------------------------------------------------------");
-            log.Info("Remote photos:");
+            log.Info($"Remote photos (first 50 of {remotePhotos.Count}):");
 
-            foreach (var photo in remotePhotos)
+            foreach (var photo in remotePhotos.Take(50))
             {
                 log.Info($"\t{photo.Album.Title} - {photo.Title}");
             }
@@ -70,8 +71,8 @@ namespace PhotoBackup.Logic
 
         private void DisplayDiskPhotos(List<DiskPhoto> diskPhotos)
         {
-            log.Info($"Indexing photos in folder: {_diskPhotoProvider.RootDir}");
-            foreach (var photo in diskPhotos)
+            log.Info($"Indexing photos in folder {_diskPhotoProvider.RootDir} (first 50 of {diskPhotos.Count}):");
+            foreach (var photo in diskPhotos.Take(50))
             {
                 log.Info($"\t{photo.Album.Title} - {photo.Title}");
             }

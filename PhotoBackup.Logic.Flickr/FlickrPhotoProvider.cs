@@ -16,12 +16,6 @@ namespace PhotoBackup.Logic.Flickr
             _photosetProvider = photosetProvider;
         }
 
-        public IEnumerable<IPhoto> GetPhotos()
-        {
-            var photoSets = _photosetProvider.GetPhotoSets();
-            return photoSets.SelectMany(GetDomainPhotosInPhotoSet);
-        }
-
         public IEnumerable<IPhoto> GetPhotos(IEnumerable<Album> albums)
         {
             var albumTitles = albums.Select(a => a.Title);

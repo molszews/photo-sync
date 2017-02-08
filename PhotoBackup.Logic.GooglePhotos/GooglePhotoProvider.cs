@@ -17,16 +17,10 @@ namespace PhotoBackup.Logic.GooglePhotos
             _service = service;
             _googleAlbumProvider = googleAlbumProvider;
         }
-
-        public IEnumerable<IPhoto> GetPhotos()
-        {
-            return GetPhotos(null);
-        }
-
+        
         private IEnumerable<PicasaAlbum> FilterAlbums(IEnumerable<Album> albums)
         {
             var googleAlbums = _googleAlbumProvider.GetAlbums();
-            if (albums == null) return googleAlbums;
             return googleAlbums.Where(
                 ga => albums.Select(a => a.Title).Contains(ga.Title, StringComparer.InvariantCultureIgnoreCase));
         }

@@ -37,7 +37,8 @@ namespace PhotoBackup.Logic.GooglePhotos
         {
             var filteredPhotos = FilterItems(photos).ToList();
             var photosByAlbum = filteredPhotos.GroupBy(p => p.Album, p => p);
-            foreach (var albumPhotos in photosByAlbum)
+            Parallel.ForEach(photosByAlbum, albumPhotos =>
+//            foreach (var albumPhotos in photosByAlbum)
             {
                 var album = albumPhotos.Key;
                 GoogleAlbum googleAlbum;
@@ -49,13 +50,13 @@ namespace PhotoBackup.Logic.GooglePhotos
                 catch (Exception e)
                 {
                     _messageHub.Publish(new AlbumUploadFailed(album, e));
-                    continue;
+                    return;
                 }
 
                 _messageHub.Publish(new AlbumUploadStart(album));
                 UploadPhotosFromAlbum(googleAlbum, albumPhotos);
                 _messageHub.Publish(new AlbumUploadEnd(album));
-            }
+            });
         }
 
         private IEnumerable<DiskPhoto> FilterItems(IEnumerable<DiskPhoto> photos)

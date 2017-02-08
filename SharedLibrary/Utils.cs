@@ -17,6 +17,7 @@ namespace SharedLibrary
                 try
                 {
                     a();
+                    return;
                 }
                 catch (Exception e)
                 {
